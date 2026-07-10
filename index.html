@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PelaSync — Logo in Motion</title>
+  <meta name="description" content="A motion study for the PelaSync mark — three ways to bring the rings to life: Sonar, Breathe, and Swell.">
+  <meta name="color-scheme" content="dark">
+
+  <!-- Open Graph so link previews look right when shared -->
+  <meta property="og:title" content="PelaSync — Logo in Motion">
+  <meta property="og:description" content="Three ways to bring the PelaSync mark to life: Sonar, Breathe, and Swell.">
+  <meta property="og:type" content="website">
+
+  <!-- Favicon: the PelaSync mark itself -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='24' fill='none' stroke='%235F9D87' stroke-width='4' opacity='.35'/%3E%3Ccircle cx='32' cy='32' r='16' fill='none' stroke='%235F9D87' stroke-width='4' opacity='.7'/%3E%3Ccircle cx='32' cy='32' r='7' fill='%23C68360'/%3E%3C/svg%3E">
+
+  <style>
+    :root {
+      --ground: #0E1815;
+      --surface: #14211D;
+      --surface-2: #1A2822;
+      --line: #26362F;
+      --line-soft: #1F2E28;
+      --ink: #EDE9E1;
+      --ink-dim: #9DB0A6;
+      --ink-faint: #6E837A;
+      --sage: #5F9D87;
+      --sage-bright: #82C4AA;
+      --clay: #C68360;
+      --clay-bright: #D89A78;
+
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --mono: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { background: var(--ground); }
+
+    body {
+      margin: 0;
+      background: var(--ground);
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: clamp(2.2rem, 5vw, 4.5rem) clamp(1.1rem, 4vw, 2rem) 4rem;
+    }
+
+    /* ---------- header ---------- */
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--sage-bright);
+      margin: 0 0 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--clay);
+      box-shadow: 0 0 0 4px rgba(198,131,96,0.18);
+    }
+
+    h1 {
+      font-size: clamp(2rem, 6vw, 3.1rem);
+      line-height: 1.04;
+      letter-spacing: -0.02em;
+      font-weight: 640;
+      text-wrap: balance;
+      margin: 0 0 0.9rem;
+    }
+    h1 em { font-style: normal; color: var(--sage-bright); }
+
+    .lede {
+      max-width: 54ch;
+      font-size: 1.06rem;
+      color: var(--ink-dim);
+      margin: 0;
+    }
+
+    /* ---------- stage ---------- */
+    .stage-card {
+      margin-top: clamp(2rem, 5vw, 3.2rem);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background:
+        radial-gradient(120% 90% at 50% 30%, rgba(95,157,135,0.10), transparent 60%),
+        var(--surface);
+      overflow: hidden;
+    }
+
+    .stage {
+      position: relative;
+      display: grid;
+      place-items: center;
+      padding: clamp(2.5rem, 8vw, 5rem);
+      background:
+        radial-gradient(60% 60% at 50% 46%, rgba(95,157,135,0.14), transparent 70%);
+    }
+    .stage::after {
+      /* subtle floor line */
+      content: "";
+      position: absolute;
+      left: 12%; right: 12%; bottom: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--line), transparent);
+    }
+
+    .stage .mark {
+      width: clamp(150px, 34vw, 230px);
+      height: clamp(150px, 34vw, 230px);
+      filter: drop-shadow(0 0 22px rgba(95,157,135,0.30));
+    }
+
+    /* ---------- the mark ---------- */
+    .mark { display: block; overflow: visible; }
+    .mark circle { transform-box: fill-box; transform-origin: center; }
+    .ring { fill: none; stroke: var(--sage); stroke-width: 4; }
+    .ring-outer { opacity: 0.35; }
+    .ring-mid   { opacity: 0.70; }
+    .dot { fill: var(--clay); }
+    .ripple {
+      fill: none;
+      stroke: var(--sage);
+      stroke-width: 3;
+      vector-effect: non-scaling-stroke;
+      opacity: 0;
+    }
+
+    /* mode: sonar / ripple */
+    .mode-ripple .ripple { animation: rippleOut var(--dur, 2.6s) linear infinite; }
+    .mode-ripple .ripple:nth-child(2) { animation-delay: calc(var(--dur, 2.6s) / -3); }
+    .mode-ripple .ripple:nth-child(3) { animation-delay: calc(var(--dur, 2.6s) * -0.666); }
+
+    /* mode: breathe */
+    .mode-breathe .dot       { animation: breathe var(--dur, 2.6s) ease-in-out infinite; }
+    .mode-breathe .ring-mid  { animation: breathe var(--dur, 2.6s) ease-in-out infinite;
+                               animation-delay: calc(var(--dur, 2.6s) / 9); }
+    .mode-breathe .ring-outer{ animation: breathe var(--dur, 2.6s) ease-in-out infinite;
+                               animation-delay: calc(var(--dur, 2.6s) / 4.5); }
+
+    /* mode: swell — static rings persist; a matching pair sheds outward over them */
+    .mode-swell .ripple {
+      stroke-width: 4;
+      vector-effect: none;                 /* stroke thickens as it grows — the "breath" body */
+      animation: swellRing calc(var(--dur, 2.6s) * 1.35) ease-out infinite;
+    }
+    .mode-swell .ripple:nth-child(1) { r: 16px; --peak: 0.70; }
+    .mode-swell .ripple:nth-child(2) { r: 24px; --peak: 0.35;
+                                       animation-delay: calc(var(--dur, 2.6s) * -0.675); }
+    .mode-swell .ripple:nth-child(3) { display: none; }
+
+    .paused .mark * { animation-play-state: paused !important; }
+
+    @keyframes rippleOut {
+      0%   { transform: scale(0.32); opacity: 0; }
+      14%  { opacity: 0.55; }
+      100% { transform: scale(2.0);  opacity: 0; }
+    }
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.085); }
+    }
+    @keyframes swellRing {
+      0%   { transform: scale(1);   opacity: 0; }
+      22%  { opacity: var(--peak, 0.6); }
+      100% { transform: scale(1.7); opacity: 0; }
+    }
+
+    /* ---------- controls ---------- */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1.3rem;
+      padding: 1rem 1.3rem;
+      border-top: 1px solid var(--line);
+      background: var(--surface-2);
+    }
+    .control {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      font-family: var(--mono);
+      font-size: 0.74rem;
+      letter-spacing: 0.05em;
+      color: var(--ink-dim);
+    }
+    .control label { text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-faint); }
+
+    input[type="range"] {
+      -webkit-appearance: none; appearance: none;
+      width: 150px; height: 3px;
+      border-radius: 3px;
+      background: var(--line);
+      outline: none;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 15px; height: 15px; border-radius: 50%;
+      background: var(--sage-bright);
+      border: 3px solid var(--surface-2);
+      box-shadow: 0 0 0 1px var(--sage);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--sage-bright); border: 3px solid var(--surface-2);
+      box-shadow: 0 0 0 1px var(--sage);
+    }
+    .speed-val { color: var(--ink); min-width: 3.2ch; text-align: right; font-variant-numeric: tabular-nums; }
+
+    button {
+      font-family: var(--mono);
+      font-size: 0.74rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink);
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0.5rem 1.1rem;
+      cursor: pointer;
+      transition: border-color 0.16s ease, color 0.16s ease, background 0.16s ease;
+    }
+    button:hover { border-color: var(--sage); color: var(--sage-bright); }
+    button:focus-visible { outline: 2px solid var(--sage-bright); outline-offset: 2px; }
+    .pause-btn { margin-left: auto; }
+
+    /* ---------- variations ---------- */
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      margin: 3.4rem 0 1.2rem;
+    }
+    .section-head h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin: 0;
+    }
+    .section-head .hint {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+
+    .variations {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.9rem;
+    }
+    @media (max-width: 640px) { .variations { grid-template-columns: 1fr; } }
+
+    .vcard {
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      padding: 1.4rem 1.3rem 1.3rem;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+      cursor: pointer;
+      text-transform: none;
+      letter-spacing: normal;
+      font-family: var(--sans);
+      transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+    }
+    .vcard:hover { transform: translateY(-2px); border-color: var(--sage); color: var(--ink); }
+    .vcard[aria-pressed="true"] {
+      border-color: var(--sage);
+      background: linear-gradient(180deg, rgba(95,157,135,0.10), transparent), var(--surface);
+      box-shadow: inset 0 0 0 1px rgba(95,157,135,0.35);
+    }
+    .vcard .mark { width: 64px; height: 64px; margin-bottom: 0.9rem; }
+    .vcard .vname {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--sage-bright);
+    }
+    .vcard .vtitle { font-size: 1rem; font-weight: 600; }
+    .vcard .vdesc { font-size: 0.86rem; color: var(--ink-dim); line-height: 1.45; }
+
+    /* ---------- context strip ---------- */
+    .context {
+      margin-top: 1.6rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.1rem 1.3rem;
+      border: 1px dashed var(--line);
+      border-radius: 14px;
+    }
+    .context .clabel {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-right: auto;
+    }
+    .chip {
+      display: grid; place-items: center;
+      width: 60px; height: 60px;
+      border-radius: 12px;
+    }
+    .chip.on-ink   { background: #0A120F; border: 1px solid var(--line); }
+    .chip.on-paper { background: #F4EFE7; }
+    .chip.tiny .mark { width: 22px; height: 22px; }
+    .chip .mark { width: 40px; height: 40px; }
+
+    /* ---------- code ---------- */
+    .code-wrap {
+      margin-top: 1.4rem;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      background: #0B1512;
+    }
+    .code-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.65rem 1rem;
+      border-bottom: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+    .code-scroll { overflow-x: auto; }
+    pre {
+      margin: 0;
+      padding: 1.1rem 1.2rem;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      line-height: 1.6;
+      color: #C7D6CE;
+    }
+    pre .t { color: var(--sage-bright); }
+    pre .a { color: var(--clay-bright); }
+    pre .c { color: var(--ink-faint); font-style: italic; }
+    .copy-btn { padding: 0.35rem 0.85rem; }
+    .copy-btn.copied { border-color: var(--sage); color: var(--sage-bright); }
+
+    footer {
+      margin-top: 2.6rem;
+      padding-top: 1.4rem;
+      border-top: 1px solid var(--line-soft);
+      font-size: 0.82rem;
+      color: var(--ink-faint);
+      max-width: 60ch;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .mark * { animation: none !important; }
+      .ripple { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="eyebrow">PelaSync · Motion Study</p>
+    <h1>A mark that keeps its <em>pulse</em>.</h1>
+    <p class="lede">Same three shapes, now alive: the rings are born at the core and travel outward — a quiet sonar that reads as <em>in sync</em>. Try each motion, set the tempo, and take the code.</p>
+
+    <div class="stage-card">
+      <div class="stage" id="stage">
+        <svg class="mark mode-ripple" viewBox="0 0 64 64" aria-label="PelaSync animated icon" role="img">
+          <g class="ripples">
+            <circle class="ripple" cx="32" cy="32" r="13"></circle>
+            <circle class="ripple" cx="32" cy="32" r="13"></circle>
+            <circle class="ripple" cx="32" cy="32" r="13"></circle>
+          </g>
+          <circle class="ring ring-outer" cx="32" cy="32" r="24"></circle>
+          <circle class="ring ring-mid"   cx="32" cy="32" r="16"></circle>
+          <circle class="dot" cx="32" cy="32" r="7"></circle>
+        </svg>
+      </div>
+      <div class="controls">
+        <div class="control">
+          <label for="speed">Tempo</label>
+          <input type="range" id="speed" min="45" max="175" value="100" step="5" aria-label="Animation speed">
+          <span class="speed-val" id="speedVal">1.0×</span>
+        </div>
+        <div class="control" id="modeLabel">Sonar</div>
+        <button class="pause-btn" id="pauseBtn" aria-pressed="false">Pause</button>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <h2>Three ways to move</h2>
+      <span class="hint">Click one to load the stage</span>
+    </div>
+
+    <div class="variations" id="variations">
+      <button class="vcard" data-mode="mode-ripple" data-name="Sonar" aria-pressed="true">
+        <svg class="mark mode-ripple" viewBox="0 0 64 64" aria-hidden="true">
+          <g class="ripples">
+            <circle class="ripple" cx="32" cy="32" r="13"></circle>
+            <circle class="ripple" cx="32" cy="32" r="13"></circle>
+            <circle class="ripple" cx="32" cy="32" r="13"></circle>
+          </g>
+          <circle class="ring ring-outer" cx="32" cy="32" r="24"></circle>
+          <circle class="ring ring-mid"   cx="32" cy="32" r="16"></circle>
+          <circle class="dot" cx="32" cy="32" r="7"></circle>
+        </svg>
+        <span class="vname">Sonar</span>
+        <span class="vtitle">Pulse out</span>
+        <span class="vdesc">Rings emanate from the core and fade as they travel. The literal ask — continuous, alive.</span>
+      </button>
+
+      <button class="vcard" data-mode="mode-breathe" data-name="Breathe" aria-pressed="false">
+        <svg class="mark mode-breathe" viewBox="0 0 64 64" aria-hidden="true">
+          <g class="ripples">
+            <circle class="ripple" cx="32" cy="32" r="13"></circle>
+            <circle class="ripple" cx="32" cy="32" r="13"></circle>
+            <circle class="ripple" cx="32" cy="32" r="13"></circle>
+          </g>
+          <circle class="ring ring-outer" cx="32" cy="32" r="24"></circle>
+          <circle class="ring ring-mid"   cx="32" cy="32" r="16"></circle>
+          <circle class="dot" cx="32" cy="32" r="7"></circle>
+        </svg>
+        <span class="vname">Breathe</span>
+        <span class="vtitle">Calm swell</span>
+        <span class="vdesc">The whole mark expands and settles, rings trailing the dot outward. Softest of the three.</span>
+      </button>
+
+      <button class="vcard" data-mode="mode-swell" data-name="Swell" aria-pressed="false">
+        <svg class="mark mode-swell" viewBox="0 0 64 64" aria-hidden="true">
+          <g class="ripples">
+            <circle class="ripple" cx="32" cy="32" r="13"></circle>
+            <circle class="ripple" cx="32" cy="32" r="13"></circle>
+            <circle class="ripple" cx="32" cy="32" r="13"></circle>
+          </g>
+          <circle class="ring ring-outer" cx="32" cy="32" r="24"></circle>
+          <circle class="ring ring-mid"   cx="32" cy="32" r="16"></circle>
+          <circle class="dot" cx="32" cy="32" r="7"></circle>
+        </svg>
+        <span class="vname">Swell</span>
+        <span class="vtitle">Breathe, set free</span>
+        <span class="vdesc">The two rings hold their home positions while a matching pair sheds outward and dissolves — always legible, always in motion.</span>
+      </button>
+    </div>
+
+    <div class="context">
+      <span class="clabel">Still reads at rest</span>
+      <div class="chip on-ink" title="On dark">
+        <svg class="mark" viewBox="0 0 64 64" aria-hidden="true">
+          <circle class="ring ring-outer" cx="32" cy="32" r="24"></circle>
+          <circle class="ring ring-mid"   cx="32" cy="32" r="16"></circle>
+          <circle class="dot" cx="32" cy="32" r="7"></circle>
+        </svg>
+      </div>
+      <div class="chip on-paper" title="On paper">
+        <svg class="mark" viewBox="0 0 64 64" aria-hidden="true">
+          <circle class="ring ring-outer" cx="32" cy="32" r="24"></circle>
+          <circle class="ring ring-mid"   cx="32" cy="32" r="16"></circle>
+          <circle class="dot" cx="32" cy="32" r="7"></circle>
+        </svg>
+      </div>
+      <div class="chip on-ink tiny" title="Favicon size">
+        <svg class="mark" viewBox="0 0 64 64" aria-hidden="true">
+          <circle class="ring ring-outer" cx="32" cy="32" r="24"></circle>
+          <circle class="ring ring-mid"   cx="32" cy="32" r="16"></circle>
+          <circle class="dot" cx="32" cy="32" r="7"></circle>
+        </svg>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <h2>Drop-in code</h2>
+      <span class="hint">Sonar · pure SVG + CSS</span>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-bar">
+        <span>pelasync-icon.html</span>
+        <button class="copy-btn" id="copyBtn">Copy</button>
+      </div>
+      <div class="code-scroll">
+<pre id="code"><span class="c">&lt;!-- 3 emanating rings + the static mark --&gt;</span>
+<span class="t">&lt;svg</span> <span class="a">class</span>=<span class="a">"pela"</span> <span class="a">viewBox</span>=<span class="a">"0 0 64 64"</span><span class="t">&gt;</span>
+  <span class="t">&lt;circle</span> <span class="a">class</span>=<span class="a">"pela-ripple"</span> <span class="a">cx</span>=<span class="a">"32"</span> <span class="a">cy</span>=<span class="a">"32"</span> <span class="a">r</span>=<span class="a">"13"</span><span class="t">/&gt;</span>
+  <span class="t">&lt;circle</span> <span class="a">class</span>=<span class="a">"pela-ripple"</span> <span class="a">cx</span>=<span class="a">"32"</span> <span class="a">cy</span>=<span class="a">"32"</span> <span class="a">r</span>=<span class="a">"13"</span><span class="t">/&gt;</span>
+  <span class="t">&lt;circle</span> <span class="a">class</span>=<span class="a">"pela-ripple"</span> <span class="a">cx</span>=<span class="a">"32"</span> <span class="a">cy</span>=<span class="a">"32"</span> <span class="a">r</span>=<span class="a">"13"</span><span class="t">/&gt;</span>
+  <span class="t">&lt;circle</span> <span class="a">fill</span>=<span class="a">"none"</span> <span class="a">stroke</span>=<span class="a">"#5F9D87"</span> <span class="a">stroke-width</span>=<span class="a">"4"</span> <span class="a">opacity</span>=<span class="a">".35"</span> <span class="a">cx</span>=<span class="a">"32"</span> <span class="a">cy</span>=<span class="a">"32"</span> <span class="a">r</span>=<span class="a">"24"</span><span class="t">/&gt;</span>
+  <span class="t">&lt;circle</span> <span class="a">fill</span>=<span class="a">"none"</span> <span class="a">stroke</span>=<span class="a">"#5F9D87"</span> <span class="a">stroke-width</span>=<span class="a">"4"</span> <span class="a">opacity</span>=<span class="a">".7"</span>  <span class="a">cx</span>=<span class="a">"32"</span> <span class="a">cy</span>=<span class="a">"32"</span> <span class="a">r</span>=<span class="a">"16"</span><span class="t">/&gt;</span>
+  <span class="t">&lt;circle</span> <span class="a">fill</span>=<span class="a">"#C68360"</span> <span class="a">cx</span>=<span class="a">"32"</span> <span class="a">cy</span>=<span class="a">"32"</span> <span class="a">r</span>=<span class="a">"7"</span><span class="t">/&gt;</span>
+<span class="t">&lt;/svg&gt;</span>
+
+<span class="t">&lt;style&gt;</span>
+.pela-ripple {
+  fill: none; stroke: #5F9D87; stroke-width: 3;
+  vector-effect: non-scaling-stroke;         <span class="c">/* crisp ring while it scales */</span>
+  transform-box: fill-box; transform-origin: center;
+  opacity: 0;
+  animation: pela-out 2.6s linear infinite;
+}
+.pela-ripple:nth-child(2) { animation-delay: -0.87s; }
+.pela-ripple:nth-child(3) { animation-delay: -1.73s; }
+
+@keyframes pela-out {
+  0%   { transform: scale(.32); opacity: 0; }
+  14%  { opacity: .55; }
+  100% { transform: scale(2);   opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pela-ripple { display: none; }             <span class="c">/* fall back to static logo */</span>
+}
+<span class="t">&lt;/style&gt;</span></pre>
+      </div>
+    </div>
+
+    <footer>
+      Every color is lifted straight from the icon — sage <span style="color:var(--sage-bright)">#5F9D87</span>, clay <span style="color:var(--clay-bright)">#C68360</span> — so it drops in without a palette change. Motion honors <span style="font-family:var(--mono);font-size:0.78rem">prefers-reduced-motion</span>: anyone with that set sees the clean static mark, no pulse.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      var stage = document.getElementById('stage');
+      var stageMark = stage.querySelector('.mark');
+      var speed = document.getElementById('speed');
+      var speedVal = document.getElementById('speedVal');
+      var pauseBtn = document.getElementById('pauseBtn');
+      var modeLabel = document.getElementById('modeLabel');
+      var cards = Array.prototype.slice.call(document.querySelectorAll('.vcard'));
+      var copyBtn = document.getElementById('copyBtn');
+
+      function applySpeed() {
+        var mult = speed.value / 100;          // 0.45 – 1.75
+        var dur = (2.6 / mult).toFixed(2) + 's';
+        stage.style.setProperty('--dur', dur);
+        speedVal.textContent = mult.toFixed(2).replace(/0$/, '') + '×';
+      }
+      speed.addEventListener('input', applySpeed);
+      applySpeed();
+
+      var paused = false;
+      pauseBtn.addEventListener('click', function () {
+        paused = !paused;
+        stage.classList.toggle('paused', paused);
+        pauseBtn.textContent = paused ? 'Play' : 'Pause';
+        pauseBtn.setAttribute('aria-pressed', String(paused));
+      });
+
+      cards.forEach(function (card) {
+        card.addEventListener('click', function () {
+          var mode = card.getAttribute('data-mode');
+          stageMark.classList.remove('mode-ripple', 'mode-breathe', 'mode-swell');
+          // reflow so the new animation restarts cleanly
+          void stageMark.offsetWidth;
+          stageMark.classList.add(mode);
+          modeLabel.textContent = card.getAttribute('data-name');
+          cards.forEach(function (c) { c.setAttribute('aria-pressed', String(c === card)); });
+        });
+      });
+
+      copyBtn.addEventListener('click', function () {
+        var text = document.getElementById('code').innerText;
+        var done = function () {
+          copyBtn.textContent = 'Copied';
+          copyBtn.classList.add('copied');
+          setTimeout(function () { copyBtn.textContent = 'Copy'; copyBtn.classList.remove('copied'); }, 1600);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done, done);
+        } else {
+          done();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
