@@ -152,16 +152,23 @@
     .mode-breathe .ring-outer{ animation: breathe var(--dur, 2.6s) ease-in-out infinite;
                                animation-delay: calc(var(--dur, 2.6s) / 4.5); }
 
-    /* mode: swell — static rings persist; a matching pair sheds outward over them */
+    /* mode: swell — a continuous outward migration. Each circle is born a clay dot
+       at the core, then grows and warms clay→sage as it drifts into the next ring's
+       spot; the outermost just swells and fades away. Three copies, a third of a
+       cycle apart, keep the flow going so the mark is always mid-shift — never the
+       fixed logo. The static ring/dot are hidden while it runs. */
+    .mode-swell .ring, .mode-swell .dot { opacity: 0; }
     .mode-swell .ripple {
+      r: 7px;                              /* each one starts at the dot's radius */
+      opacity: 1;                          /* base .ripple is opacity:0 — the keyframe drives fill/stroke opacity instead */
+      fill: var(--clay);
+      stroke: var(--sage);
       stroke-width: 4;
-      vector-effect: none;                 /* stroke thickens as it grows — the "breath" body */
-      animation: swellRing calc(var(--dur, 2.6s) * 1.35) ease-out infinite;
+      vector-effect: non-scaling-stroke;   /* ring stays a crisp 4px as it scales out */
+      animation: swellMigrate calc(var(--dur, 2.6s) * 1.7) linear infinite;
     }
-    .mode-swell .ripple:nth-child(1) { r: 16px; --peak: 0.70; }
-    .mode-swell .ripple:nth-child(2) { r: 24px; --peak: 0.35;
-                                       animation-delay: calc(var(--dur, 2.6s) * -0.675); }
-    .mode-swell .ripple:nth-child(3) { display: none; }
+    .mode-swell .ripple:nth-child(2) { animation-delay: calc(var(--dur, 2.6s) * -0.567); }
+    .mode-swell .ripple:nth-child(3) { animation-delay: calc(var(--dur, 2.6s) * -1.133); }
 
     .paused .mark * { animation-play-state: paused !important; }
 
@@ -174,10 +181,14 @@
       0%, 100% { transform: scale(1); }
       50%      { transform: scale(1.085); }
     }
-    @keyframes swellRing {
-      0%   { transform: scale(1);   opacity: 0; }
-      22%  { opacity: var(--peak, 0.6); }
-      100% { transform: scale(1.7); opacity: 0; }
+    @keyframes swellMigrate {
+      /* scale is relative to r=7: 1 → dot, 2.29 → mid ring (r16), 3.43 → outer ring (r24) */
+      0%   { transform: scale(0.5);  fill-opacity: 0;    stroke-opacity: 0;    }
+      9%   { transform: scale(1);    fill-opacity: 0.95; stroke-opacity: 0;    }
+      30%  {                         fill-opacity: 0.35; stroke-opacity: 0.55; }
+      44%  { transform: scale(2.29); fill-opacity: 0;    stroke-opacity: 0.70; }
+      76%  { transform: scale(3.43); fill-opacity: 0;    stroke-opacity: 0.35; }
+      100% { transform: scale(4.4);  fill-opacity: 0;    stroke-opacity: 0;    }
     }
 
     /* ---------- controls ---------- */
@@ -375,6 +386,10 @@
     @media (prefers-reduced-motion: reduce) {
       .mark * { animation: none !important; }
       .ripple { display: none; }
+      /* swell hides the static mark while it animates — restore it for the still view */
+      .mode-swell .ring-outer { opacity: 0.35; }
+      .mode-swell .ring-mid   { opacity: 0.70; }
+      .mode-swell .dot        { opacity: 1; }
     }
   </style>
 </head>
@@ -386,7 +401,7 @@
 
     <div class="stage-card">
       <div class="stage" id="stage">
-        <svg class="mark mode-ripple" viewBox="0 0 64 64" aria-label="PelaSync animated icon" role="img">
+        <svg class="mark mode-swell" viewBox="0 0 64 64" aria-label="PelaSync animated icon" role="img">
           <g class="ripples">
             <circle class="ripple" cx="32" cy="32" r="13"></circle>
             <circle class="ripple" cx="32" cy="32" r="13"></circle>
@@ -403,7 +418,7 @@
           <input type="range" id="speed" min="45" max="175" value="100" step="5" aria-label="Animation speed">
           <span class="speed-val" id="speedVal">1.0×</span>
         </div>
-        <div class="control" id="modeLabel">Sonar</div>
+        <div class="control" id="modeLabel">Swell</div>
         <button class="pause-btn" id="pauseBtn" aria-pressed="false">Pause</button>
       </div>
     </div>
@@ -414,7 +429,7 @@
     </div>
 
     <div class="variations" id="variations">
-      <button class="vcard" data-mode="mode-ripple" data-name="Sonar" aria-pressed="true">
+      <button class="vcard" data-mode="mode-ripple" data-name="Sonar" aria-pressed="false">
         <svg class="mark mode-ripple" viewBox="0 0 64 64" aria-hidden="true">
           <g class="ripples">
             <circle class="ripple" cx="32" cy="32" r="13"></circle>
@@ -446,7 +461,7 @@
         <span class="vdesc">The whole mark expands and settles, rings trailing the dot outward. Softest of the three.</span>
       </button>
 
-      <button class="vcard" data-mode="mode-swell" data-name="Swell" aria-pressed="false">
+      <button class="vcard" data-mode="mode-swell" data-name="Swell" aria-pressed="true">
         <svg class="mark mode-swell" viewBox="0 0 64 64" aria-hidden="true">
           <g class="ripples">
             <circle class="ripple" cx="32" cy="32" r="13"></circle>
@@ -458,8 +473,8 @@
           <circle class="dot" cx="32" cy="32" r="7"></circle>
         </svg>
         <span class="vname">Swell</span>
-        <span class="vtitle">Breathe, set free</span>
-        <span class="vdesc">The two rings hold their home positions while a matching pair sheds outward and dissolves — always legible, always in motion.</span>
+        <span class="vtitle">Endless migration</span>
+        <span class="vdesc">Every circle drifts to the next ring out — clay warming to sage as it grows — while a fresh dot rises at the core. Always mid-shift, never at rest.</span>
       </button>
     </div>
 
